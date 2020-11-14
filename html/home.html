@@ -1,0 +1,236 @@
+<html>
+    <head>
+        <style>
+          .card {
+  box-shadow: 0 4px 8px 0 rgba(0, 0, 0, 0.2);
+  width:30%;
+  height: 20%;
+  margin: 3% 2% 2% 0;;
+  text-align: center;
+  font-family: arial;
+}
+
+.price {
+  color: grey;
+  font-size: 22px;
+}
+.card img{
+
+  width: 300px;
+  height: 300px;
+}
+.card button {
+  border: none;
+  outline: 0;
+  padding: 12px;
+  color: white;
+  background-color: #000;
+  text-align: center;
+  cursor: pointer;
+  width: 100%;
+  font-size: 18px;
+}
+
+.card button:hover {
+  opacity: 0.7;
+}
+.container{
+    display: flex;
+}
+.fixed{
+    width: 200px;
+}
+.flex-item{
+    flex-grow: 1;
+}
+/* Add a black background color to the top navigation */
+.topnav {
+  background-color: #333;
+  overflow: hidden;
+}
+
+/* Style the links inside the navigation bar */
+.topnav a {
+  float: left;
+  color: #230fdb;
+  text-align: center;
+  padding: 14px 16px;
+  text-decoration: none;
+  font-size: 17px;
+}
+
+/* Change the color of links on hover */
+.topnav a:hover {
+  background-color: #ddd;
+  color: black;
+}
+
+/* Add a color to the active/current link */
+.topnav a.active {
+  background-color: rgb(47, 26, 236);
+  color: white;
+}
+.topnav img{
+  height: 40px;
+  width:40px;
+  margin-left: 70%;
+  margin-top: 5px;
+}
+.topnav input[type=image]{
+    height: 30px;
+    width: 37px;
+  margin:5px 0 0 5px;
+  
+  background:red;
+}
+.topnav button[id=login]{
+    margin-left: 900px;
+    
+    font-size: 20px;
+    background: rgb(110, 8, 206);
+}
+
+
+        </style>
+        <script type="text/javascript">
+        var cart;
+        var addedToCart=[];
+        var totalProduct=[];
+        //GetAllProduct  From The Database
+          function getAllProducts(){
+            let _url='http://localhost:3000/products/getAll';
+            fetch(_url, {
+                    method: 'GET',
+                    headers: {
+                        'content-type': 'application/json',
+                        'Access-Control-Allow-Origin':'*',
+                        'Access-Control-Allow-Origin': 'https://github.com/ram276/ibm-fsd000GER/blob/master/images',
+                        'Access-Control-Allow-Credentials': 'true',
+                         'Access-Control-Allow-Methods': 'POST'
+                      
+                    },
+                   
+        }).then(res=>res.json())
+          .then((res)=>{
+          
+      if(res != null && res!='')
+     {
+            const len=res.length;
+            var arr=[];
+              for(var i=0;i<len ;i++)
+              {
+                var addToCart='addToCart'+i;
+                var id=res[i].id;
+                var size=res[i].p_size;
+                var name=res[i].p_name;
+               var src1=res[i].p_url;
+               var price=res[i].p_price;
+               var brand=res[i].p_brand;
+               var desc=res[i].p_description;
+               totalProduct.push(id);
+                var c=[`  <div class="card" style="display:inline-block;" >
+          <img src="${src1}">
+          <h1>${brand}</h1>
+          <p class="price">Rs:${price}</p>
+          <p>${desc}</p>
+          <p><button id=${id} onclick="saveToCart('${id}','${size}','${name}','${src1}','${price}','${brand}','${desc}')">Add to Cart</button></p>
+        </div>`]
+                  arr.push(c); 
+                
+      
+            }
+            document.getElementById('image').innerHTML=arr;
+             
+            
+              
+            
+   } 
+              else{
+                    alert("sorry for the inconvenience.Try after sometime");
+                } 
+              
+          })
+                    
+            
+          }
+
+          // save data to database in cart table
+          function saveToCart(id,size,name,src1,price,brand,desc)
+          
+          {
+            var token=localStorage.getItem("token");  
+            if(token==undefined)
+             alert("login to add product to cart");
+             else{
+            var quantity ='1';
+            let _url='http://localhost:3000/carts/saveToCart';
+            fetch(_url, {
+                    method: 'POST',
+                    headers: {
+                        'content-type': 'application/json'
+                      
+                    },
+                    body: JSON.stringify({
+                        id: id,
+                        price:price,
+                        name: name,
+                        size:size,
+                        desc:desc,
+                        brand:brand,
+                        quantity:quantity,
+                        url:src1,
+                        token:token
+                    })  
+        }).then(res=>res.json())
+        .then((res)=>{
+                 console.log(res.message);
+                if(res.message =="error"){
+                  alert("you have to first login to website");
+                }
+                if(res.message=="suc"){
+                  window.location.href='C:/Users/RamMurti/Documents/My Project/html page/cart.html';
+
+                }
+          })
+        }  
+        }
+
+
+//Amazon.html to Cart.html
+function cart()
+
+{
+  var token=localStorage.getItem("token");
+  if(token==undefined){
+    alert("login to see the added product");
+  }
+  else
+  window.location.href='C:/Users/RamMurti/Documents/My Project/html page/cart.html';
+}
+
+
+
+
+           //Disable Add To Cart Button 
+           
+            function login(){
+                window.location.href='C:/Users/RamMurti/Documents/My Project/html page/login.html';
+            }
+           
+        </script>
+    </head>
+    <body onload="getAllProducts()">
+        <div class="topnav">
+            <a class="active" href="#home">Home</a>
+            <a href="#news">News</a>
+            <a href="#contact">Contact</a>
+            <button id=login  onclick="login()">login</button>
+            <input type="image" src="C:/Users/RamMurti/Documents/My Project/html page/cart.jpg" name="saveForm" onclick="cart()" class="btTxt submit" id="saveForm" />
+
+          </div>
+        <div id=image ></div>
+        
+           
+                  
+    </body>
+</html>
